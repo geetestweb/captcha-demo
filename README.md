@@ -1,4 +1,4 @@
-# captcha-vue2-demo
+# captcha3-vue2
 
 ## Project setup
 ```
