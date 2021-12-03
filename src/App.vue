@@ -1,74 +1,44 @@
 <template>
-  <div id="app">
-    <!-- use geetest button to show capthca -->
-    <div v-if="useNativeButton" class="captcha-wrap"></div>
+  <!-- use geetest button to show capthca -->
+  <div v-if="useNativeButton" class="captcha-wrap"></div>
 
-    <!-- define button to show capthca -->
-    <button v-else @click="showCaptchaByCustomBtn" class="captcha-btn">Custom Button</button>
-    
-  </div>
+  <!-- define button to show capthca -->
+  <button v-else @click="showCaptchaByCustomBtn" class="captcha-btn">
+    Custom Button
+  </button>
 </template>
 
 <script>
+import useCaptcha from "./useCaptcha";
 export default {
   name: "App",
+  
+  setup() {
+    const {
+      initCaptcha,
+      useNativeButton,
+      showCaptchaByNativeBtn,
+      showCaptchaByCustomBtn,
+      onSuccess,
+    } = useCaptcha();
 
-  data() {
-    return {
-      // use geetest button to show captcha
-      useNativeButton: false,
-      // verification result
-      result: null,
+    // use native button
+    useNativeButton.value = true;
 
-      // captcha instance
-      captcha: null,
-      // captcha config
-      options: {
-        product: 'float'
-      }
-    };
-  },
+    (async function () {
+      // wait for Captcha instance
+      await initCaptcha();
 
-  async created() {
-    this.options.product = this.useNativeButton ? 'float': 'bind'
-    
-    this.captcha = await this.initCaptcha();
-    console.log('this.captcha: ', this.captcha);
-    this.useNativeButton && this.showCaptchaByNativeBtn();
-    this.onSuccess()
-  },
-
-  methods: {
-    async initCaptcha() {
-      //Ensure gt, challenge and success are not null
-      const { data: { challenge, gt, new_captcha, success } } = await window.axios.get(`https://www.geetest.com/demo/gt/register-slide?t=${new Date().getTime()}`)
-      this.options = {
-        gt,
-        challenge,
-        new_captcha,
-        offline: !success,
-        ...this.options
-      }
+      useNativeButton.value && showCaptchaByNativeBtn(".captcha-wrap");
       
-      return new Promise((resolve) => {
-        window.initGeetest(this.options, gt => resolve(gt));
-      });
-    },
+      const res = await onSuccess();
+      console.log("res: ", res);
+    })();
 
-    showCaptchaByNativeBtn() {
-      this.captcha.appendTo('.captcha-wrap')
-    },
-
-    showCaptchaByCustomBtn () {
-      this.captcha.verify()
-    },
-
-    onSuccess() {
-      this.captcha.onSuccess(() => {
-        this.result = this.captcha.getValidate()
-        console.log('result: ', this.result);
-      })
-    }
+    return {
+      useNativeButton,
+      showCaptchaByCustomBtn,
+    };
   },
 };
 </script>
