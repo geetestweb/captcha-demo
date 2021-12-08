@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Captcha from "./components/captcha/captcha";
 
@@ -10,7 +9,7 @@ class App extends Component {
       result: null, // verification result
       options: {
         // captcha config
-        product: "float",
+        product: "float", // toggle bind or float
         lang: "en",
       },
     };
@@ -36,9 +35,9 @@ class App extends Component {
         ...this.state.options,
       },
     });
-    
+
     //Ensure gt, challenge and success are not null
-    this.captcha.current.initCaptcha();
+    this.captcha.current.initGeetest();
   }
 
   captchaReady = () => {
@@ -47,10 +46,13 @@ class App extends Component {
 
   captchaSuccess = (data) => {
     console.log("onSuccess", data);
+    this.setState({
+      result: data, 
+    });
   };
 
   captchaReset = () => {
-    this.captcha.current.reset();
+    this.captcha.current.verify();
   };
 
   render() {
@@ -58,14 +60,17 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
           <Captcha
             options={options}
             ref={this.captcha}
             onReady={this.captchaReady}
             onSuccess={this.captchaSuccess}
           ></Captcha>
-          <button onClick={this.captchaReset}>reset</button>
+          {options.product === "bind" ? (
+            <button onClick={this.captchaReset}>Custom Button</button>
+          ) : (
+            ""
+          )}
         </header>
       </div>
     );

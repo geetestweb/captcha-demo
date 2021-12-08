@@ -8,7 +8,7 @@ export default class Captcha extends React.Component {
     this.captcha = null
   }
 
-  initCaptcha() {
+  initGeetest() {
     window.initGeetest(this.props.options, (gt) => {
       gt.appendTo(".gt-captcha-wrap");
       gt.onReady(() => {
